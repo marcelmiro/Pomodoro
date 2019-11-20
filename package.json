@@ -10,8 +10,8 @@
     "type": "git",
     "url": "git+https://github.com/marcelmiro/Pomodoro.git"
   },
-  "author": "Marcel",
-  "license": "ISC",
+  "author": "Marcel Miro",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/marcelmiro/Pomodoro/issues"
   },
