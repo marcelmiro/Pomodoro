@@ -7,8 +7,8 @@
     <title>Pomodoro Timer</title>
 
     <!--    FONTS    -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:300,400&display=swap" rel="stylesheet">
 
     <!--    CSS LIBRARY    -->
 
@@ -20,13 +20,76 @@
 </head>
 <body>
 
-<h1>Pomodoro Timer</h1>
+
+<div id="main-container">
+
+    <div>
+        <div class="title">
+            <h1 v-if="!isCountdown">Pomodoro Timer</h1>
+            <p v-if="!isCountdown">Stop waisting time and get a top-notch productivity booster!</p>
+            <h2 v-if="isCountdown">{{ roundName }}</h2>
+        </div>
+    
+        <div id="timer-container">
+            <div id="svg-container">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="688.512 371.487 207.031 189.013">
+                    <path fill-opacity="0" stroke-width="5" stroke="#FFFFFF" stroke-opacity="0.2" stroke-linecap="round" d=" M 732 556 C 661 506.5 690.25 374.5 793.125 376 C 896 377.5 921.5 504 852 556" />
+                    <path id="timer-path" fill-opacity="0" stroke-width="5" stroke="#FFFFFF" stroke-linecap="round" d=" M 732 556 C 661 506.5 690.25 374.5 793.125 376 C 896 377.5 921.5 504 852 556" />
+                </svg>
+                
+                <h2>{{ minutes | timerFormat }}<small>:{{ seconds | timerFormat }}</small></h2>
+                
+            </div>
+            <div id="rounds-container">
+                <ul>
+                    <li v-for="i in parseInt(roundRange)">•</li>
+                </ul>
+            </div>
+    
+            <div id="button-container">
+                <button id="restart" class="button timer-button">⭮</button>
+                <button id="play" class="button timer-button"
+                        @click="playFunc">
+                    <div v-bind:class="{ 'play': playState, 'pause': !playState }"></div>
+                </button>
+                <button id="continue" class="button timer-button"><img src="assets/icon_fast_forward.svg" alt="Fast Forward Icon" /></button>
+    
+            </div>
+        </div>
+        
+        
+        
+    </div>
+    
+    <table style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 20px;">
+        <tr>
+            <td>
+                <input type="range" min="1" max="60" value="25" v-model="timerRange" @input="changeProgress"><br>
+                timerRange: {{ timerRange }}<br>
+                {{ minutes | timerFormat }}:{{ seconds | timerFormat }}
+            </td>
+            <td>
+                <input type="range" min="1" max="10" value="4" v-model="roundRange"><br>
+                roundRange: {{ roundRange }}
+            </td>
+        </tr>
+    </table>
+
+</div>
+<!--<div id="hDiv" style="height: 100vh;"></div>-->
 
 
-<!--    JS LIBRARY    -->
+
+
+
+
+<!--    JS LIBS    -->
+<script src="node_modules/vue/dist/vue.js"></script>
+<script src="https://rawgit.com/kimmobrunfeldt/progressbar.js/1.0.0/dist/progressbar.js"></script>
 
 <!--    MAIN JS    -->
-<script  src="main.js"></script>
+<script src="main.js"></script>
+<!--<script  src="dist/main.js"></script>-->
 
 </body>
 </html>

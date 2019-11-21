@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/marcelmiro/Pomodoro/issues"
   },
-  "homepage": "https://github.com/marcelmiro/Pomodoro#readme"
+  "homepage": "https://github.com/marcelmiro/Pomodoro#readme",
+  "dependencies": {
+    "vue": "^2.6.10",
+    "vue-progress": "^0.2.1",
+    "webpack": "^4.41.2",
+    "webpack-dev-server": "^3.9.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.3.10"
+  }
 }
