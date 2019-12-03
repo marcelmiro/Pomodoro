@@ -28,6 +28,9 @@
             <h1 v-if="!isCountdown">Pomodoro Timer</h1>
             <p v-if="!isCountdown">Stop waisting time and get a top-notch productivity booster!</p>
             <h2 v-if="isCountdown">{{ roundName }}</h2>
+            
+            <button id="settings" @click="openTab('settings')"><img src="assets/icon_settings.svg" alt="Settings Icon" /></button>
+            <button id="todo" @click="openTab('todo')"><img src="assets/icon_todo.svg" alt="To do list Icon" /></button>
         </div>
     
         <div id="timer-container">
@@ -47,38 +50,139 @@
             </div>
     
             <div id="button-container">
-                <button id="restart" class="button timer-button">⭮</button>
-                <button id="play" class="button timer-button"
+                <button id="restart" class="button timer-button anim" @click="resetTimer">⭮</button>
+                <button id="play" class="button timer-button anim"
                         @click="playFunc">
                     <div v-bind:class="{ 'play': playState, 'pause': !playState }"></div>
                 </button>
-                <button id="continue" class="button timer-button"><img src="assets/icon_fast_forward.svg" alt="Fast Forward Icon" /></button>
+                <button class="button timer-button anim" @click="fastForwardTimer"><img src="assets/icon_fast_forward.svg" alt="Fast Forward Icon" /></button>
     
             </div>
         </div>
-        
-        
-        
     </div>
     
-    <table style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 20px;">
-        <tr>
-            <td>
-                <input type="range" min="1" max="60" value="25" v-model="timerRange" @input="changeProgress"><br>
-                timerRange: {{ timerRange }}<br>
-                {{ minutes | timerFormat }}:{{ seconds | timerFormat }}
-            </td>
-            <td>
-                <input type="range" min="1" max="10" value="4" v-model="roundRange"><br>
-                roundRange: {{ roundRange }}
-            </td>
-        </tr>
-    </table>
+    
+    <div id="settings-container">
+        <div class="overlay" @click="removeOverlay('settings')"></div>
+        
+        <div class="container">
+            <nav>
+                <ul>
+                    <li @click="settingsTabs('time')">&#9203;</li>
+                    <li @click="settingsTabs('audio')">&#128266;</li>
+                    <li @click="settingsTabs('add')">💿</li>
+                    <hr />
+                </ul>
+            </nav>
+            
+            <div id="page-container">
+                <div id="time-page">
+                    <p>Work</p>
+                    <span>{{ workRange | timerFormat }}:00</span><br>
+                    <input class="slider" type="range" min="1" max="60" value="25" v-model="workRange" @input="changeCountdown">
+                    
+                    <p>Short Break</p>
+                    <span>{{ sBreakRange | timerFormat }}:00</span><br>
+                    <input class="slider" type="range" min="1" max="10" value="4" v-model="sBreakRange">
+                    
+                    <p>Long Break</p>
+                    <span>{{ lBreakRange | timerFormat }}:00</span><br>
+                    <input class="slider" type="range" min="1" max="45" value="15" v-model="lBreakRange">
+                    
+                    <p>Rounds</p>
+                    <span>{{ roundRange }}</span><br>
+                    <input class="slider" type="range" min="1" max="10" value="4" v-model="roundRange" @input="changeRound"><br>
+                    
+                    <button class="default underline" @click="resetDefault('time')">Reset to Default</button>
+                </div>
+                
+                <div id="audio_page">
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Music:</p>
+                        <input class="toggle" type="checkbox" v-model="isMusic" @click="musicState" />
+                    </div>
+                    
+                    <p>Notification Volume</p>
+                    <span>{{ soundVolume }}%</span><br>
+                    <input class="slider" type="range" min="0" max="100" value="100" v-model="soundVolume">
+                    
+                    <p>Music Volume</p>
+                    <span>{{ musicVolume }}%</span><br>
+                    <input disabled id="music-slider" class="slider disabled" type="range" min="0" max="100" value="75" v-model="musicVolume" @input="changeVolume">
+                    
+                    <div id="music_container">
+                        <button disabled class="disabled" @click="musicOn('nature')">Nature</button>
+                        <button disabled class="disabled" @click="musicOn('rain')">Rain</button>
+                        <button disabled class="disabled" @click="musicOn('cafe')">Café</button>
+                        <button disabled class="disabled" @click="musicOn('music')">Music</button>
+                    </div>
+                    
+                    <button class="default underline" @click="resetDefault('audio')">Reset to Default</button>
+                </div>
+                
+                <div id="add_page">
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Auto-start pomodoros:</p>
+                        <input class="toggle" type="checkbox" v-model="autoPomodoro" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Auto-start breaks:</p>
+                        <input class="toggle" type="checkbox" v-model="autoBreak" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Don't start pomodoro<br>if To Do List is empty:</p>
+                        <input class="toggle" type="checkbox" v-model="autoTodoEmpty" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Infinite:</p>
+                        <input class="toggle" type="checkbox" v-model="infinite" @input="changeInfinite" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Play music in breaks:</p>
+                        <input class="toggle" type="checkbox" v-model="musicInBreaks" />
+                    </div>
+                    
+                    <button class="default underline" @click="resetDefault('add')">Reset to Default</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div id="todo-container">
+        <div class="overlay" @click="removeOverlay('todo')"></div>
+        
+        <div class="container">
+            <div id="task-container">
+                <p v-if="Object.keys(tasks).length === 0">You have no tasks to complete...</p>
+            </div>
+            
+            <div class="task" v-for="(task, index) in tasks">
+                <span @click="completeTask(index)" :class="{priority: task.priority}">{{ task.text }}</span>
+                <span @click="completeTask(index)" class="complete" :class="{priority: task.priority}">{{ task.text }}</span>
+                <button class="anim" @click="removeTask(index)">&#10006;</button>
+            </div>
+            
+            <div id="add-task-container">
+                <textarea placeholder="Add your tasks here..."
+                          rows="1"
+                          maxlength="60"
+                          spellcheck="false"
+                          oninput="this.style.height = '';this.style.height = this.scrollHeight - 10 + 'px';"
+                          v-model="newTask"
+                          @keydown.enter.prevent="addTask"></textarea>
+                <button id="add-task" class="button anim" @click="addTask">+</button>
+                <!--<span>{{ 50 - newTask.length }}</span>-->
+            </div>
+        </div>
+        
+    </div>
 
 </div>
-<!--<div id="hDiv" style="height: 100vh;"></div>-->
-
-
 
 
 
