@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "web: index.html"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -16,9 +16,12 @@
   "bugs": {
     "url": "https://github.com/marcelmiro/Pomodoro/issues"
   },
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "homepage": "https://github.com/marcelmiro/Pomodoro#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "vue": "^2.6.10",
     "vue-progress": "^0.2.1"
   },
