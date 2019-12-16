@@ -1,2 +1,2 @@
 # Pomodoro Timer
-### [Website](https://marcelmiro.github.io/Pomodoro/)
+### [Website](https://pomodoro-website.herokuapp.com/)
