@@ -1,16 +1,13 @@
-var express = require("express");
-var app = express();
 
-//set port
-var port = process.env.PORT || 8080
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 8080;
 
-app.use(express.static(__dirname + "/public"));
+app.use("/scripts", express.static("scripts"));
+app.use("/assets", express.static("assets"));
 
-//routes
-app.get("/", function(req, res) {
-    res.render("index");
-});
+app.get('/', (req, res) => res.sendFile(__dirname + "/index.html"));
 
-app.listen(port, function() {
-    console.log("app running");
+app.listen(port, () => {
+    console.log('Server connected at:',port);
 });
