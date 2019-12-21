@@ -338,6 +338,7 @@ html, body {
   width: 80px;
   font-size: 20px;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 #settings-container .container hr {
   height: 0.25rem;
