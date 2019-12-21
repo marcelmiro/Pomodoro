@@ -12,6 +12,7 @@ button {
   margin: 0;
   padding: 0;
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
   background: none;
   cursor: pointer;
   font-family: Roboto, "PT Sans", Helvetica, Arial, sans-serif;
