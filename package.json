@@ -22,6 +22,7 @@
   "homepage": "https://github.com/marcelmiro/Pomodoro#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "sass": "^1.23.7",
     "vue": "^2.6.10",
     "vue-progress": "^0.2.1"
   },

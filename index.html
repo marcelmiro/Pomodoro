@@ -24,13 +24,17 @@
 <div id="main-container">
 
     <div>
+        <div id="button-icons">
+            <button id="settings" @click="openTab('settings')"><img src="assets/icon_settings.svg" alt="Settings Icon" /></button>
+            <button id="todo" @click="openTab('todo')"><img src="assets/icon_todo.svg" alt="To do list Icon" /></button>
+        </div>
         <div class="title">
             <h1 v-if="!isCountdown">Pomodoro Timer</h1>
             <p v-if="!isCountdown">Stop waisting time and get a top-notch productivity booster!</p>
-            <h2 v-if="isCountdown">{{ roundName }}</h2>
-            
-            <button id="settings" @click="openTab('settings')"><img src="assets/icon_settings.svg" alt="Settings Icon" /></button>
-            <button id="todo" @click="openTab('todo')"><img src="assets/icon_todo.svg" alt="To do list Icon" /></button>
+            <div>
+                <h2 v-if="isCountdown">{{ roundName }}</h2>
+                <h2 class="short" v-if="isCountdown">{{ shortRoundName }}</h2>
+            </div>
         </div>
     
         <div id="timer-container">
@@ -50,12 +54,12 @@
             </div>
     
             <div id="button-container">
-                <button id="restart" class="button timer-button anim" @click="resetTimer">⭮</button>
+                <button id="restart" class="button timer-button anim" @click="resetTimer"><img src="assets/button_restart.svg" alt="Restart Icon" /></button>
                 <button id="play" class="button timer-button anim"
                         @click="playFunc">
                     <div v-bind:class="{ 'play': playState, 'pause': !playState }"></div>
                 </button>
-                <button class="button timer-button anim" @click="fastForwardTimer"><img src="assets/icon_fast_forward.svg" alt="Fast Forward Icon" /></button>
+                <button class="button timer-button anim" @click="fastForwardTimer"><img src="assets/button_fast_forward.svg" alt="Fast Forward Icon" /></button>
     
             </div>
         </div>
@@ -68,9 +72,12 @@
         <div class="container">
             <nav>
                 <ul>
-                    <li @click="settingsTabs('time')">&#9203;</li>
-                    <li @click="settingsTabs('audio')">&#128266;</li>
-                    <li @click="settingsTabs('add')">💿</li>
+<!--                    <li @click="settingsTabs('time')">&#9203;</li>-->
+                    <li @click="settingsTabs('time')"><img src="assets/settings_hourglass.svg" alt="Hourglass icon" /></li>
+<!--                    <li @click="settingsTabs('audio')">&#128266;</li>-->
+                    <li @click="settingsTabs('audio')"><img src="assets/settings_volume.svg" alt="Speaker icon" /></li>
+<!--                    <li @click="settingsTabs('add')">💿</li>-->
+                    <li @click="settingsTabs('add')"><img src="assets/settings_plus.svg" alt="Additional icon" /></li>
                     <hr />
                 </ul>
             </nav>
@@ -132,7 +139,7 @@
                     </div>
     
                     <div class="toggle-container">
-                        <p style="display: inline-block; vertical-align: middle;">Don't start pomodoro<br>if To Do List is empty:</p>
+                        <p style="display: inline-block; vertical-align: middle;">Don't start auto-pomodoro<br>if To Do List is empty:</p>
                         <input class="toggle" type="checkbox" v-model="autoTodoEmpty" />
                     </div>
     

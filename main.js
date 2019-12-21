@@ -1,12 +1,15 @@
 
+
 let app = new Vue({
     el: "#main-container",
     data: {
         roundName: "",
+        roundNameShort: "",
         roundNames: ["Focus on work", "Take a short break", "Take a long break"],
+        roundNamesShort: ["Work", "Short break", "Long break"],
         roundRange: 4,
-        workRange: 25,
-        sBreakRange: 4,
+        workRange: 0.1,
+        sBreakRange: 0.1,
         lBreakRange: 15,
         currentRound: 1,
         totalRound: 0,
@@ -51,6 +54,12 @@ let app = new Vue({
                 this.totalRound = 20;
             } else {
                 this.roundRange = 4;
+
+                if (typeof(Storage) !== "undefined" && localStorage.getItem("roundRange") !== null) {
+                    this.roundRange = localStorage.getItem("roundRange");
+                } else {
+                    this.roundRange = 4;
+                }
                 this.changeRound();
             }
         },
@@ -279,20 +288,24 @@ let app = new Vue({
             }
 
             this.musicPlaying = true;
-            music[this.musicPref].volume = 0;
+            music[this.musicPref].muted = false;
             music[this.musicPref].play();
 
-            let i = 0;
-            function volumeLoop() {
-                setTimeout(function() {
-                    music[app.musicPref].volume = i / 100;
-                    if (i < app.musicVolume) {
-                        volumeLoop();
-                    }
-                    i++;
-                }, 70);
+            if (fx === "nature") {
+                music[this.musicPref].volume = 0;
+                let i = 0;
+                function volumeLoop() {
+                    setTimeout(function() {
+                        i++;
+                        music[app.musicPref].volume = i / 100;
+
+                        if (i < app.musicVolume) {
+                            volumeLoop();
+                        }
+                    }, 30);
+                }
+                volumeLoop();
             }
-            volumeLoop();
         },
         settingsTabs: function(tab) {
             if (tab === "time") {
@@ -336,6 +349,7 @@ let app = new Vue({
             },);
 
             this.newTask = "";
+            this.vueGetStorage();
         },
         removeTask: function(id) {
             document.querySelector(".task:nth-child(" + (id + 2) + ")").classList.add("remove");
@@ -344,25 +358,104 @@ let app = new Vue({
                 app.tasks.splice(id, 1);
                 [].forEach.call(document.querySelectorAll(".task"), function (el) { el.classList.remove("remove"); });
             }, 500);
+            this.vueGetStorage();
         },
         completeTask: function(id) {
             //this.tasks[id].completed = !this.tasks[id].completed;
 
             //document.querySelector(".task:nth-child(" + (id + 2) + ") span.complete").classList.toggle("completed");
             [].forEach.call(document.querySelectorAll(".task:nth-child(" + (id + 2) + ") span"), function (el) { el.classList.toggle("completed"); });
-        }
+            this.vueGetStorage();
+        },
+        vueGetStorage: function() {
+            if (typeof(Storage) !== "undefined") {
+                localStorage.setItem("roundRange", this.roundRange);
+                localStorage.setItem("workRange", this.workRange);
+                localStorage.setItem("sBreakRange", this.sBreakRange);
+                localStorage.setItem("lBreakRange", this.lBreakRange);
+                localStorage.setItem("soundVolume", this.soundVolume);
+                localStorage.setItem("musicVolume", this.musicVolume);
+                localStorage.setItem("musicPref", this.musicPref);
+                localStorage.setItem("isMusic", this.isMusic);
+                localStorage.setItem("autoPomodoro", this.autoPomodoro);
+                localStorage.setItem("autoBreak", this.autoBreak);
+                localStorage.setItem("autoTodoEmpty", this.autoTodoEmpty);
+                localStorage.setItem("infinite", this.infinite);
+                localStorage.setItem("musicInBreaks", this.musicInBreaks);
+                localStorage.setItem("tasks", this.tasks);
+                if (!this.newTask.startsWith("Can't add more tasks...")) {
+                    localStorage.setItem("newTask", this.newTask);
+                } else {
+                    localStorage.setItem("newTask", "");
+                }
+            }
+        },
     },
     filters: {
         timerFormat: function(value) {
             return value.toString().length === 1 ? "0" + value : value;
         }
-    }
-});
+    },
+    computed: {
+        shortRoundName: function() {
+            for (let i = 0; i < this.roundNames.length; i++) {
+                if (this.roundName === this.roundNames[i]) {
+                    return this.roundNamesShort[i];
+                }
+            }
+            return "";
+        }
+    },
+    watch: {
+        roundRange: { handler() { this.vueGetStorage(); } },
+        workRange: { handler() { this.vueGetStorage(); } },
+        sBreakRange: { handler() { this.vueGetStorage(); } },
+        lBreakRange: { handler() { this.vueGetStorage(); } },
+        soundVolume: { handler() { this.vueGetStorage(); } },
+        musicVolume: { handler() { this.vueGetStorage(); } },
+        musicPref: { handler() { this.vueGetStorage(); } },
+        isMusic: { handler() { this.vueGetStorage(); } },
+        autoPomodoro: { handler() { this.vueGetStorage(); } },
+        autoBreak: { handler() { this.vueGetStorage(); } },
+        autoTodoEmpty: { handler() { this.vueGetStorage(); } },
+        infinite: { handler() { this.vueGetStorage(); } },
+        musicInBreaks: { handler() { this.vueGetStorage(); } },
+    },
+    mounted: function() {
+        if (typeof(Storage) !== "undefined" && localStorage.getItem("roundRange") !== null) {
+            this.roundRange = localStorage.getItem("roundRange");
+            this.workRange = localStorage.getItem("workRange");
+            this.minutes = localStorage.getItem("workRange");
+            this.sBreakRange = localStorage.getItem("sBreakRange");
+            this.lBreakRange = localStorage.getItem("lBreakRange");
+            this.soundVolume = localStorage.getItem("soundVolume");
+            this.musicVolume = localStorage.getItem("musicVolume");
+            this.musicPref = localStorage.getItem("musicPref");
+            // Can't autoplay if user has not interacted with website first
+            //this.isMusic = (localStorage.getItem("isMusic") === "true");
+            this.autoPomodoro = (localStorage.getItem("autoPomodoro") === "true");
+            this.autoBreak = (localStorage.getItem("autoBreak") === "true");
+            this.autoTodoEmpty = (localStorage.getItem("autoTodoEmpty") === "true");
+            this.infinite = (localStorage.getItem("infinite") === "true");
+            this.musicInBreaks = (localStorage.getItem("musicInBreaks") === "true");
+            this.tasks = localStorage.getItem("tasks");
+            this.newTask = localStorage.getItem("newTask");
 
+            /*
+            if (this.isMusic) {
+                this.isMusic = false;
+                this.musicState();
+                this.isMusic = true;
+            }
+            */
+        } else {
+            this.vueGetStorage();
+        }
+    },
+});
 
 let timerBar = new ProgressBar.Path('#timer-path');
 timerBar.set(1);
-
 
 let sound = {
     "work" : new Audio("assets/audio_break.mp3"),
@@ -375,4 +468,3 @@ let music = {
     "cafe" : new Audio("assets/audio_cafe.mp3"),
     "music" : new Audio("assets/audio_music.mp3")
 };
-
