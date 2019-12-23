@@ -172,20 +172,21 @@
         <div class="overlay" @click="removeOverlay('todo')"></div>
         
         <div class="container">
-            <div id="task-container">
-                <p v-if="Object.keys(tasks).length === 0">You have no tasks to complete...</p>
-            </div>
+            <p v-if="Object.keys(tasks).length === 0">You have no tasks to complete</p>
             
-            <div class="task" v-for="(task, index) in tasks">
-                <span @click="completeTask(index)" :class="{priority: task.priority}">{{ task.text }}</span>
-                <span @click="completeTask(index)" class="complete" :class="{priority: task.priority}">{{ task.text }}</span>
-                <button class="anim" @click="removeTask(index)">&#10006;</button>
+            <div id="task-container">
+                <div class="task" v-for="(task, index) in tasks">
+                    <div @click="completeTask(index)" class="tick-container"><div class="tick"></div></div>
+                    <span :class="{priority: task.priority}">{{ task.text }}</span>
+                    <span class="complete" :class="{priority: task.priority}">{{ task.text }}</span>
+                    <button @click="removeTask(index)">&#10006;</button>
+                </div>
             </div>
             
             <div id="add-task-container">
                 <textarea placeholder="Add your tasks here..."
                           rows="1"
-                          maxlength="60"
+                          maxlength="50"
                           spellcheck="false"
                           oninput="this.style.height = '';this.style.height = this.scrollHeight - 10 + 'px';"
                           v-model="newTask"

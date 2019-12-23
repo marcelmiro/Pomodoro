@@ -320,13 +320,16 @@ let app = new Vue({
             }
         },
         addTask: function() {
+            if (this.newTask.length <= 0) { return; }
             if (Object.keys(this.tasks).length >= 8) {
+                document.querySelector("#todo-container #add-task-container textarea").disabled = true;
                 this.newTask = "Can't add more tasks...";
                 document.querySelector("#add-task-container textarea").classList.add("alert");
 
                 setTimeout(function() {
                     app.newTask === "Can't add more tasks..." ? app.newTask = "" : "";
                     document.querySelector("#add-task-container textarea").classList.remove("alert");
+                    document.querySelector("#todo-container #add-task-container textarea").disabled = false;
                 }, 3000);
                 return;
             }
@@ -349,25 +352,41 @@ let app = new Vue({
             },);
 
             this.newTask = "";
-            this.vueGetStorage();
+            this.getStorage();
         },
         removeTask: function(id) {
-            document.querySelector(".task:nth-child(" + (id + 2) + ")").classList.add("remove");
+            document.querySelector(".task:nth-child(" + (id + 1) + ")").classList.add("remove");
+            document.querySelector(".task:nth-child(" + (id + 1) + ") button").classList.add("remove");
 
             setTimeout(function() {
-                app.tasks.splice(id, 1);
                 [].forEach.call(document.querySelectorAll(".task"), function (el) { el.classList.remove("remove"); });
+                [].forEach.call(document.querySelectorAll(".task button"), function (el) { el.classList.remove("remove"); });
+                app.tasks.splice(id, 1);
+
+                for (let i = 0; i < app.tasks.length; i++) {
+                    app.tasks[i].completed = !app.tasks[i].completed;
+                    app.completeTask(i);
+                }
             }, 500);
-            this.vueGetStorage();
+            this.getStorage();
         },
         completeTask: function(id) {
-            //this.tasks[id].completed = !this.tasks[id].completed;
+            this.tasks[id].completed = !this.tasks[id].completed;
 
-            //document.querySelector(".task:nth-child(" + (id + 2) + ") span.complete").classList.toggle("completed");
-            [].forEach.call(document.querySelectorAll(".task:nth-child(" + (id + 2) + ") span"), function (el) { el.classList.toggle("completed"); });
-            this.vueGetStorage();
+            if (this.tasks[id].completed) {
+                [].forEach.call(document.querySelectorAll(".task:nth-child(" + (id + 1) + ") span"), function (el) { el.classList.add("completed"); });
+
+                document.querySelector(".task:nth-child(" + (id + 1) + ") .tick-container").classList.add("tick-complete");
+                document.querySelector(".task:nth-child(" + (id + 1) + ") .tick-container .tick").classList.add("draw");
+            } else {
+                [].forEach.call(document.querySelectorAll(".task:nth-child(" + (id + 1) + ") span"), function (el) { el.classList.remove("completed"); });
+
+                document.querySelector(".task:nth-child(" + (id + 1) + ") .tick-container").classList.remove("tick-complete");
+                document.querySelector(".task:nth-child(" + (id + 1) + ") .tick-container .tick").classList.remove("draw");
+            }
+            this.getStorage();
         },
-        vueGetStorage: function() {
+        getStorage: function() {
             if (typeof(Storage) !== "undefined") {
                 localStorage.setItem("roundRange", this.roundRange);
                 localStorage.setItem("workRange", this.workRange);
@@ -382,12 +401,12 @@ let app = new Vue({
                 localStorage.setItem("autoTodoEmpty", this.autoTodoEmpty);
                 localStorage.setItem("infinite", this.infinite);
                 localStorage.setItem("musicInBreaks", this.musicInBreaks);
-                localStorage.setItem("tasks", this.tasks);
                 if (!this.newTask.startsWith("Can't add more tasks...")) {
                     localStorage.setItem("newTask", this.newTask);
                 } else {
                     localStorage.setItem("newTask", "");
                 }
+                localStorage.setItem("tasks", JSON.stringify(this.tasks));
             }
         },
     },
@@ -407,49 +426,58 @@ let app = new Vue({
         }
     },
     watch: {
-        roundRange: { handler() { this.vueGetStorage(); } },
-        workRange: { handler() { this.vueGetStorage(); } },
-        sBreakRange: { handler() { this.vueGetStorage(); } },
-        lBreakRange: { handler() { this.vueGetStorage(); } },
-        soundVolume: { handler() { this.vueGetStorage(); } },
-        musicVolume: { handler() { this.vueGetStorage(); } },
-        musicPref: { handler() { this.vueGetStorage(); } },
-        isMusic: { handler() { this.vueGetStorage(); } },
-        autoPomodoro: { handler() { this.vueGetStorage(); } },
-        autoBreak: { handler() { this.vueGetStorage(); } },
-        autoTodoEmpty: { handler() { this.vueGetStorage(); } },
-        infinite: { handler() { this.vueGetStorage(); } },
-        musicInBreaks: { handler() { this.vueGetStorage(); } },
+        roundRange: { handler() { this.getStorage(); } },
+        workRange: { handler() { this.getStorage(); } },
+        sBreakRange: { handler() { this.getStorage(); } },
+        lBreakRange: { handler() { this.getStorage(); } },
+        soundVolume: { handler() { this.getStorage(); } },
+        musicVolume: { handler() { this.getStorage(); } },
+        musicPref: { handler() { this.getStorage(); } },
+        isMusic: { handler() { this.getStorage(); } },
+        autoPomodoro: { handler() { this.getStorage(); } },
+        autoBreak: { handler() { this.getStorage(); } },
+        autoTodoEmpty: { handler() { this.getStorage(); } },
+        infinite: { handler() { this.getStorage(); } },
+        musicInBreaks: { handler() { this.getStorage(); } },
+        newTask: { handler() { this.getStorage(); } },
+        tasks: { handler() {
+            this.getStorage();
+            todoWindowMedia = window.matchMedia("(max-height: " + checkTodoHeight() + "px)");
+            adaptTodoContainer(todoWindowMedia);
+        } },
     },
     mounted: function() {
-        if (typeof(Storage) !== "undefined" && localStorage.getItem("roundRange") !== null) {
-            this.roundRange = localStorage.getItem("roundRange");
-            this.workRange = localStorage.getItem("workRange");
-            this.minutes = localStorage.getItem("workRange");
-            this.sBreakRange = localStorage.getItem("sBreakRange");
-            this.lBreakRange = localStorage.getItem("lBreakRange");
-            this.soundVolume = localStorage.getItem("soundVolume");
-            this.musicVolume = localStorage.getItem("musicVolume");
-            this.musicPref = localStorage.getItem("musicPref");
-            // Can't autoplay if user has not interacted with website first
-            //this.isMusic = (localStorage.getItem("isMusic") === "true");
-            this.autoPomodoro = (localStorage.getItem("autoPomodoro") === "true");
-            this.autoBreak = (localStorage.getItem("autoBreak") === "true");
-            this.autoTodoEmpty = (localStorage.getItem("autoTodoEmpty") === "true");
-            this.infinite = (localStorage.getItem("infinite") === "true");
-            this.musicInBreaks = (localStorage.getItem("musicInBreaks") === "true");
-            this.tasks = localStorage.getItem("tasks");
-            this.newTask = localStorage.getItem("newTask");
+        if (typeof(Storage) !== "undefined") {
+            if (localStorage.getItem("roundRange") !== null) {
+                this.roundRange = localStorage.getItem("roundRange");
+                this.workRange = localStorage.getItem("workRange");
+                this.minutes = localStorage.getItem("workRange");
+                this.sBreakRange = localStorage.getItem("sBreakRange");
+                this.lBreakRange = localStorage.getItem("lBreakRange");
+                this.soundVolume = localStorage.getItem("soundVolume");
+                this.musicVolume = localStorage.getItem("musicVolume");
+                this.musicPref = localStorage.getItem("musicPref");
+                // Can't autoplay audio if user has not interacted with website first (HTML5 rule)
+                //this.isMusic = (localStorage.getItem("isMusic") === "true");
+                this.autoPomodoro = (localStorage.getItem("autoPomodoro") === "true");
+                this.autoBreak = (localStorage.getItem("autoBreak") === "true");
+                this.autoTodoEmpty = (localStorage.getItem("autoTodoEmpty") === "true");
+                this.infinite = (localStorage.getItem("infinite") === "true");
+                this.musicInBreaks = (localStorage.getItem("musicInBreaks") === "true");
+                this.newTask = localStorage.getItem("newTask");
+                this.tasks = JSON.parse(localStorage.getItem("tasks"));
 
-            /*
-            if (this.isMusic) {
-                this.isMusic = false;
-                this.musicState();
-                this.isMusic = true;
-            }
-            */
-        } else {
-            this.vueGetStorage();
+                for (let i = 0; i < this.tasks.length; i++) {
+                    if (this.tasks[i].completed) {
+                        setTimeout(function() {
+                            document.querySelector(".task:nth-child(" + (i + 1) + ") .tick-container").classList.add("tick-complete");
+                            document.querySelector(".task:nth-child(" + (i + 1) + ") .tick-container .tick").classList.add("draw");
+
+                            [].forEach.call(document.querySelectorAll(".task:nth-child(" + (i + 1) + ") span"), function (el) { el.classList.toggle("completed"); });
+                        }, 0);
+                    }
+                }
+            } else { this.getStorage(); }
         }
     },
 });
@@ -468,3 +496,40 @@ let music = {
     "cafe" : new Audio("assets/audio_cafe.mp3"),
     "music" : new Audio("assets/audio_music.mp3")
 };
+
+
+let todoWindowMedia = window.matchMedia("(max-height: " + checkTodoHeight() + "px)");
+function checkTodoHeight() {
+    if (app.$data.tasks.length === 0) {
+        return 101 + 40;
+    } else if (app.$data.tasks.length === 1) {
+        return 130 + 40;
+    } else if (app.$data.tasks.length > 1 && app.$data.tasks.length <= 8) {
+        return 130 + (app.$data.tasks.length - 1) * 65 + 40;
+    }
+}
+function adaptTodoContainer(media) {
+    if (media.matches) {
+        document.querySelector("#todo-container .container").style.cssText =
+            "top: 20px; " +
+            "transform: translate(0, 0); " +
+            "height: calc(100% - 40px);";
+        document.querySelector("#todo-container .container #task-container").style.cssText = "overflow-y: scroll; " +
+            "overflow-x: hidden; " +
+            "height: calc(100% - 50px);";
+    } else {
+        document.querySelector("#todo-container .container").style.cssText =
+            "top: 50%; " +
+            "transform: translateY(-50%); " +
+            "height: auto;";
+        document.querySelector("#todo-container .container #task-container").style.overflow = "hidden";
+        document.querySelector("#todo-container .container #task-container").style.height = "auto";
+    }
+}
+
+window.addEventListener("load", function() {
+    adaptTodoContainer(todoWindowMedia);
+});
+window.addEventListener("resize", function() {
+    adaptTodoContainer(todoWindowMedia);
+});

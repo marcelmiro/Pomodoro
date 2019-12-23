@@ -566,7 +566,7 @@ html, body {
 #todo-container .container {
   z-index: 11;
   position: absolute;
-  right: -350px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
   transition: right 0.3s ease-out;
@@ -574,18 +574,17 @@ html, body {
   border-radius: 15px;
   text-align: center;
   overflow: hidden;
-  padding: 10px 25px 60px;
   min-height: 51px;
   width: 300px;
 }
 #todo-container .container #add-task-container {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 350px;
+  position: relative;
+  width: 100%;
   border-top: 0.2px solid #E3E3E3;
-  padding: 5px 0 5px 5px;
+  padding: 5px 10px;
   text-align: left;
+  background: white;
+  z-index: 10;
 }
 #todo-container .container #add-task-container > * {
   vertical-align: middle;
@@ -609,7 +608,6 @@ html, body {
 }
 #todo-container .container #add-task-container textarea.alert {
   font-weight: 500;
-  color: red;
 }
 #todo-container .container #add-task-container button.button {
   border-radius: 50%;
@@ -629,49 +627,83 @@ html, body {
   -webkit-box-shadow: 0 0 24px 3px rgba(253, 77, 75, 0.5);
   box-shadow: 0 0 24px 3px rgba(253, 77, 75, 0.5);
 }
+#todo-container .container #task-container {
+  position: relative;
+  padding: 0 25px;
+}
 #todo-container .container .task {
   position: relative;
-  background: white;
   width: 100%;
   min-height: 40px;
   display: flex;
-  box-shadow: 1px 10px 20px 0 rgba(218, 215, 206, 0.9);
   margin: 15px auto;
   transition-property: all;
 }
+#todo-container .container .task + .task:after {
+  content: "";
+  height: 1px;
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 100%;
+  background: #EFEFEF;
+}
+#todo-container .container .task .tick-container {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  position: relative;
+  display: inline-block;
+  transform: translateY(calc(-50% + 25px));
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: border 500ms ease-out;
+}
+#todo-container .container .task .tick-container.tick-complete {
+  -webkit-animation: none;
+  animation: none;
+  border-color: lawngreen;
+  transition: border 500ms ease-out;
+}
+#todo-container .container .task .tick-container .tick:not(.draw) {
+  display: none;
+}
+#todo-container .container .task .tick-container .tick.draw {
+  display: block;
+}
+#todo-container .container .task .tick-container .tick.draw:after {
+  animation-duration: 800ms;
+  animation-timing-function: ease;
+  animation-name: tick;
+}
+#todo-container .container .task .tick-container .tick:after {
+  transform: scaleX(-1) rotate(135deg);
+  opacity: 1;
+  height: 12px;
+  width: 6px;
+  transform-origin: left top;
+  border-right: 2px solid lawngreen;
+  border-top: 2px solid lawngreen;
+  content: "";
+  left: 4px;
+  top: 13.5px;
+  position: absolute;
+}
 #todo-container .container .task span {
   float: left;
-  padding: 0 10px;
+  padding: 0 10px 0 15px;
   height: 50px;
-  width: calc(100% - 40px);
+  width: calc(100% - 95px);
   display: inline-flex;
   vertical-align: middle;
   align-items: center;
   text-align: left;
   font-weight: 300;
-  cursor: pointer;
   text-decoration: none;
   position: relative;
   transition: opacity 0.3s ease-out;
-  z-index: 2;
-  /*
-  &:after {
-    content: "";
-    height: 2px;
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
-    width: 0;
-    transition: width 0.1s ease-out;
-    background: #141414;
-    opacity: .6;
-  }
-  */
 }
 #todo-container .container .task span.priority {
-  background: #fd6664;
-  color: white;
   font-weight: 500;
 }
 #todo-container .container .task span:not(.complete) {
@@ -686,14 +718,9 @@ html, body {
   position: absolute;
   margin: 0;
   opacity: 0;
-  width: 234.844px;
+  left: 26px;
 }
 #todo-container .container .task span.complete.completed {
-  /*
-  transition-duration: .6s;
-  transition-timing-function: cubic-bezier(0.095, 0.385, 0.400, 0.885);
-  &:after { width: calc(100% - 20px); }
-  */
   opacity: 0.6;
 }
 #todo-container .container .task.remove {
@@ -709,18 +736,18 @@ html, body {
 }
 #todo-container .container .task button {
   position: relative;
-  height: 50px;
-  width: 50px;
-  color: white;
-  background: #FD4D4B;
-  font-size: 30px;
+  right: 0;
+  top: 0;
+  width: 40px;
+  color: #888888;
+  font-size: 25px;
+  transition: color ease-in-out 0.2s, transform 0.8s cubic-bezier(0.095, 0.385, 0.4, 0.885);
 }
-#todo-container .container .task button:after {
-  border-radius: 0;
+#todo-container .container .task button:hover {
+  color: #666666;
 }
-#todo-container .container .task button:active:after {
-  width: 50px;
-  height: 50px;
+#todo-container .container .task button.remove {
+  transform: rotate(180deg);
 }
 
 /*    MEDIA QUERY    */
@@ -937,6 +964,15 @@ html, body {
     transform: scale(0.8);
   }
 }
+@media screen and (max-height: 500px) {
+  #settings-container .container {
+    top: 20px;
+    transform: translate(0, 0);
+    height: calc(100% - 40px);
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+}
 /*    ANIMATIONS    */
 @keyframes blink {
   0% {
@@ -949,24 +985,26 @@ html, body {
     opacity: 0.3;
   }
 }
-@keyframes removeTask {
+@keyframes tick {
   0% {
-    left: 0;
+    height: 0;
+    width: 0;
+    opacity: 1;
   }
-  25% {
-    min-height: 40px;
-    height: 50px;
+  20% {
+    height: 0;
+    width: 6px;
+    opacity: 1;
   }
-  50% {
-    left: 100px;
-    opacity: 0;
-  }
-  99% {
-    display: flex;
+  40% {
+    height: 12px;
+    width: 6px;
+    opacity: 1;
   }
   100% {
-    min-height: 0;
-    height: 0;
+    height: 12px;
+    width: 6px;
+    opacity: 1;
   }
 }
 
