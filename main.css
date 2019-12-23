@@ -566,7 +566,7 @@ html, body {
 #todo-container .container {
   z-index: 11;
   position: absolute;
-  right: 20px;
+  right: -350px;
   top: 50%;
   transform: translateY(-50%);
   transition: right 0.3s ease-out;

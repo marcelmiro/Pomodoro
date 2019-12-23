@@ -486,8 +486,7 @@ html, body {
 	.container {
 		z-index: 11;
 		position: absolute;
-		//right: -350px;
-		right: 20px;
+		right: -350px;
 		top: 50%;
 		transform: translateY(-50%);
 		transition: right .3s ease-out;
