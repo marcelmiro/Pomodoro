@@ -353,6 +353,8 @@ let app = new Vue({
 
             this.newTask = "";
             this.getStorage();
+            todoWindowMedia = window.matchMedia("(max-height: " + checkTodoHeight() + "px)");
+            adaptTodoContainer(todoWindowMedia);
         },
         removeTask: function(id) {
             document.querySelector(".task:nth-child(" + (id + 1) + ")").classList.add("remove");
@@ -369,6 +371,8 @@ let app = new Vue({
                 }
             }, 500);
             this.getStorage();
+            todoWindowMedia = window.matchMedia("(max-height: " + checkTodoHeight() + "px)");
+            adaptTodoContainer(todoWindowMedia);
         },
         completeTask: function(id) {
             this.tasks[id].completed = !this.tasks[id].completed;
@@ -440,11 +444,7 @@ let app = new Vue({
         infinite: { handler() { this.getStorage(); } },
         musicInBreaks: { handler() { this.getStorage(); } },
         newTask: { handler() { this.getStorage(); } },
-        tasks: { handler() {
-            this.getStorage();
-            todoWindowMedia = window.matchMedia("(max-height: " + checkTodoHeight() + "px)");
-            adaptTodoContainer(todoWindowMedia);
-        } },
+        tasks: { handler() { this.getStorage(); } },
     },
     mounted: function() {
         if (typeof(Storage) !== "undefined") {
@@ -510,18 +510,21 @@ function checkTodoHeight() {
 }
 function adaptTodoContainer(media) {
     if (media.matches) {
-        document.querySelector("#todo-container .container").style.cssText =
-            "top: 20px; " +
-            "transform: translate(0, 0); " +
-            "height: calc(100% - 40px);";
-        document.querySelector("#todo-container .container #task-container").style.cssText = "overflow-y: scroll; " +
-            "overflow-x: hidden; " +
-            "height: calc(100% - 50px);";
+        let temp = document.querySelector("#todo-container .container").style;
+        temp.top = "20px";
+        temp.transform = "translateY(0)";
+        temp.height = "calc(100% - 40px)";
+
+        temp = document.querySelector("#todo-container .container #task-container").style;
+        temp.overflowY = "scroll";
+        temp.overflowX = "hidden";
+        temp.height = "calc(100% - 50%)";
     } else {
-        document.querySelector("#todo-container .container").style.cssText =
-            "top: 50%; " +
-            "transform: translateY(-50%); " +
-            "height: auto;";
+        let temp = document.querySelector("#todo-container .container").style;
+        temp.top = "50%";
+        temp.transform = "translateY(-50%)";
+        temp.height = "auto";
+
         document.querySelector("#todo-container .container #task-container").style.overflow = "hidden";
         document.querySelector("#todo-container .container #task-container").style.height = "auto";
     }

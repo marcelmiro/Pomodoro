@@ -577,6 +577,9 @@ html, body {
   min-height: 51px;
   width: 300px;
 }
+#todo-container .container p:not([class]):not([id]) {
+  margin: 22px auto 16px;
+}
 #todo-container .container #add-task-container {
   position: relative;
   width: 100%;
@@ -584,7 +587,7 @@ html, body {
   padding: 5px 10px;
   text-align: left;
   background: white;
-  z-index: 10;
+  z-index: 12;
 }
 #todo-container .container #add-task-container > * {
   vertical-align: middle;
