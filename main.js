@@ -518,7 +518,7 @@ function adaptTodoContainer(media) {
         temp = document.querySelector("#todo-container .container #task-container").style;
         temp.overflowY = "scroll";
         temp.overflowX = "hidden";
-        temp.height = "calc(100% - 50%)";
+        temp.height = "calc(100% - 50px)";
     } else {
         let temp = document.querySelector("#todo-container .container").style;
         temp.top = "50%";

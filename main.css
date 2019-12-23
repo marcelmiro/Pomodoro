@@ -581,7 +581,9 @@ html, body {
   margin: 22px auto 16px;
 }
 #todo-container .container #add-task-container {
-  position: relative;
+  position: absolute;
+  left: 0;
+  bottom: 0;
   width: 100%;
   border-top: 0.2px solid #E3E3E3;
   padding: 5px 10px;
@@ -632,7 +634,7 @@ html, body {
 }
 #todo-container .container #task-container {
   position: relative;
-  padding: 0 25px;
+  padding: 0 25px 50px;
 }
 #todo-container .container .task {
   position: relative;
@@ -689,7 +691,7 @@ html, body {
   border-top: 2px solid lawngreen;
   content: "";
   left: 4px;
-  top: 13.5px;
+  top: 13px;
   position: absolute;
 }
 #todo-container .container .task span {
@@ -905,15 +907,18 @@ html, body {
   }
   #main-container .title {
     position: absolute !important;
-    top: auto !important;
-    bottom: 75% !important;
+    top: 0 !important;
     left: 50% !important;
-    transform: translate(-50%, 50%) !important;
+    transform: translate(-50%, 0) !important;
   }
   #main-container .title h2.short {
     visibility: visible !important;
     display: inline-block !important;
     width: 300px !important;
+    position: absolute !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
   #main-container #timer-container {
     top: 50%;
@@ -921,9 +926,8 @@ html, body {
   }
 }
 @media (min-width: 500px) and (max-height: 500px) {
-  #main-container .title {
-    bottom: 380px !important;
-    transform: translate(-50%, 0) !important;
+  #main-container .title h2.short {
+    top: 70px !important;
   }
   #main-container #timer-container {
     top: auto;
@@ -931,7 +935,7 @@ html, body {
     bottom: 50px;
   }
 }
-@media (min-width: 500px) and (max-height: 450px) {
+@media screen and (min-width: 500px) and (max-height: 450px) {
   #timer-container {
     bottom: auto !important;
     top: 60% !important;
