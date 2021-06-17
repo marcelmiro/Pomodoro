@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--    MAIN INFO    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pomodoro Timer</title>
+
+    <!--    FONTS    -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:300,400&display=swap" rel="stylesheet">
+
+    <!--    MAIN CSS    -->
+    <link rel="stylesheet" href="index.css">
+
+    <!--    FAVICONS    -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+	<link rel="manifest" href="assets/favicon/site.webmanifest">
+	<link rel="mask-icon" href="assets/favicon/safari-pinned-tab.svg" color="#fd4d4b">
+	<link rel="shortcut icon" href="assets/favicon/favicon.ico">
+	<meta name="msapplication-TileColor" content="#fd4d4b">
+	<meta name="msapplication-config" content="assets/favicon/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+
+<div id="main-container">
+
+    <div>
+        <div id="button-icons">
+            <button id="settings" @click="openTab('settings')"><img src="assets/icon_settings.svg" alt="Settings Icon" /></button>
+            <button id="todo" @click="openTab('todo')"><img src="assets/icon_todo.svg" alt="To do list Icon" /></button>
+        </div>
+        <div class="title">
+            <h1 v-if="!isCountdown">Pomodoro Timer</h1>
+            <p v-if="!isCountdown">Stop waisting time and get a top-notch productivity booster!</p>
+            <div>
+                <h2 v-if="isCountdown">{{ roundName }}</h2>
+                <h2 class="short" v-if="isCountdown">{{ shortRoundName }}</h2>
+            </div>
+        </div>
+    
+        <div id="timer-container">
+            <div id="svg-container">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="688.512 371.487 207.031 189.013">
+                    <path fill-opacity="0" stroke-width="5" stroke="#FFFFFF" stroke-opacity="0.2" stroke-linecap="round" d=" M 732 556 C 661 506.5 690.25 374.5 793.125 376 C 896 377.5 921.5 504 852 556" />
+                    <path id="timer-path" fill-opacity="0" stroke-width="5" stroke="#FFFFFF" stroke-linecap="round" d=" M 732 556 C 661 506.5 690.25 374.5 793.125 376 C 896 377.5 921.5 504 852 556" />
+                </svg>
+                
+                <h2>{{ minutes | timerFormat }}<small>:{{ seconds | timerFormat }}</small></h2>
+                
+            </div>
+            <div id="rounds-container">
+                <ul>
+                    <li v-for="i in parseInt(roundRange)">•</li>
+                </ul>
+            </div>
+    
+            <div id="button-container">
+                <button id="restart" class="button timer-button anim" @click="resetTimer"><img src="assets/button_restart.svg" alt="Restart Icon" /></button>
+                <button id="play" class="button timer-button anim"
+                        @click="playFunc">
+                    <div v-bind:class="{ 'play': playState, 'pause': !playState }"></div>
+                </button>
+                <button class="button timer-button anim" @click="fastForwardTimer"><img src="assets/button_fast_forward.svg" alt="Fast Forward Icon" /></button>
+    
+            </div>
+        </div>
+    </div>
+    
+    
+    <div id="settings-container">
+        <div class="overlay" @click="removeOverlay('settings')"></div>
+        
+        <div class="container">
+            <nav>
+                <ul>
+<!--                    <li @click="settingsTabs('time')">&#9203;</li>-->
+                    <li @click="settingsTabs('time')"><img src="assets/settings_hourglass.svg" alt="Hourglass icon" /></li>
+<!--                    <li @click="settingsTabs('audio')">&#128266;</li>-->
+                    <li @click="settingsTabs('audio')"><img src="assets/settings_volume.svg" alt="Speaker icon" /></li>
+<!--                    <li @click="settingsTabs('add')">💿</li>-->
+                    <li @click="settingsTabs('add')"><img src="assets/settings_plus.svg" alt="Additional icon" /></li>
+                    <hr />
+                </ul>
+            </nav>
+            
+            <div id="page-container">
+                <div id="time-page">
+                    <p>Work</p>
+                    <span>{{ workRange | timerFormat }}:00</span><br>
+                    <input class="slider" type="range" min="1" max="60" value="25" v-model="workRange" @input="changeCountdown">
+                    
+                    <p>Short Break</p>
+                    <span>{{ sBreakRange | timerFormat }}:00</span><br>
+                    <input class="slider" type="range" min="1" max="10" value="4" v-model="sBreakRange">
+                    
+                    <p>Long Break</p>
+                    <span>{{ lBreakRange | timerFormat }}:00</span><br>
+                    <input class="slider" type="range" min="1" max="45" value="15" v-model="lBreakRange">
+                    
+                    <p>Rounds</p>
+                    <span>{{ roundRange }}</span><br>
+                    <input class="slider" type="range" min="1" max="10" value="4" v-model="roundRange" @input="changeRound"><br>
+                    
+                    <button class="default underline" @click="resetDefault('time')">Reset to Default</button>
+                </div>
+                
+                <div id="audio_page">
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Music:</p>
+                        <input class="toggle" type="checkbox" v-model="isMusic" @click="musicState" />
+                    </div>
+                    
+                    <p>Notification Volume</p>
+                    <span>{{ soundVolume }}%</span><br>
+                    <input class="slider" type="range" min="0" max="100" value="100" v-model="soundVolume">
+                    
+                    <p>Music Volume</p>
+                    <span>{{ musicVolume }}%</span><br>
+                    <input disabled id="music-slider" class="slider disabled" type="range" min="0" max="100" value="75" v-model="musicVolume" @input="changeVolume">
+                    
+                    <div id="music_container">
+                        <button disabled class="disabled" @click="musicOn('nature')">Nature</button>
+                        <button disabled class="disabled" @click="musicOn('rain')">Rain</button>
+                        <button disabled class="disabled" @click="musicOn('cafe')">Café</button>
+                        <button disabled class="disabled" @click="musicOn('music')">Music</button>
+                    </div>
+                    
+                    <button class="default underline" @click="resetDefault('audio')">Reset to Default</button>
+                </div>
+                
+                <div id="add_page">
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Auto-start pomodoros:</p>
+                        <input class="toggle" type="checkbox" v-model="autoPomodoro" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Auto-start breaks:</p>
+                        <input class="toggle" type="checkbox" v-model="autoBreak" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Don't start auto-pomodoro<br>if To Do List is empty:</p>
+                        <input class="toggle" type="checkbox" v-model="autoTodoEmpty" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Infinite:</p>
+                        <input class="toggle" type="checkbox" v-model="infinite" @input="changeInfinite" />
+                    </div>
+    
+                    <div class="toggle-container">
+                        <p style="display: inline-block; vertical-align: middle;">Play music in breaks:</p>
+                        <input class="toggle" type="checkbox" v-model="musicInBreaks" />
+                    </div>
+                    
+                    <button class="default underline" @click="resetDefault('add')">Reset to Default</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div id="todo-container">
+        <div class="overlay" @click="removeOverlay('todo')"></div>
+        
+        <div class="container">
+            <p v-if="Object.keys(tasks).length === 0">You have no tasks to complete</p>
+            
+            <div id="task-container">
+                <div class="task" v-for="(task, index) in tasks">
+                    <div @click="completeTask(index)" class="tick-container"><div class="tick"></div></div>
+                    <span :class="{priority: task.priority}">{{ task.text }}</span>
+                    <span class="complete" :class="{priority: task.priority}">{{ task.text }}</span>
+                    <button @click="removeTask(index)">&#10006;</button>
+                </div>
+            </div>
+            
+            <div id="add-task-container">
+                <textarea placeholder="Add your tasks here..."
+                          rows="1"
+                          maxlength="50"
+                          spellcheck="false"
+                          oninput="this.style.height = '';this.style.height = this.scrollHeight - 10 + 'px';"
+                          v-model="newTask"
+                          @keydown.enter.prevent="addTask"></textarea>
+                <button id="add-task" class="button anim" @click="addTask">+</button>
+                <!--<span>{{ 50 - newTask.length }}</span>-->
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+
+
+<!--    JS LIBS    -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+<script src="https://rawgit.com/kimmobrunfeldt/progressbar.js/1.0.0/dist/progressbar.js"></script>
+
+<!--    MAIN JS    -->
+<script src="index.js"></script>
+
+</body>
+</html>
